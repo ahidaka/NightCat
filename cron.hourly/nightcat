@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# Simple cron script - save the current clock periodically in case of
+# a power failure or other crash
+
+if [ -x /etc/rc.d/nightcat.sh ] ; then
+  /etc/rc.d/nightcat.sh &
+fi
