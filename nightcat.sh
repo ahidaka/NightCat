@@ -1,9 +1,14 @@
 #!/bin/sh
 
-logger -i "nightcat checking"
+#
+# Night Cat
+#
 
 MYPID=$$
 ALREADY_RUNNING=""
+EGW="/etc/rc.d/egw-back.sh"
+
+logger -i "nightcat checking"
 
 ps ax | fgrep nightcat | grep -v grep | awk '{ print $1 }' > /tmp/nightcat.tmp
 
@@ -25,9 +30,17 @@ logger -i "nightcat real start"
 echo ${MYPID} > /var/tmp/dpride/nightcat.pid
 
 while [ 1 ] ; do
-    echo 'nightcat now!' > /tmp/nightcat.test
+    echo 'nightcat now!' > /tmp/nightcat.now
     ##echo 'nightcat now!'
-    sleep 120
+
+    if [ -x ${EGW} ] ; then
+	sh ${EGW}
+    fi
+    
+    #
+    # wait for next check
+    #
+    sleep 300
 done
 
 logger -i "nightcat real stop"
