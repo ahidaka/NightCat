@@ -98,12 +98,13 @@ echo DBG: CHECK_PGM=${CHECK_PGM} ##### DBG
 for file in ${CHECK_PGM} ; do
 
     sleep 1
-
+    PID=""
     SYM=`echo ${file} | sed -e "s/[\r\n]\+//g"`
     ALREADY_RUNNING=""
     PGM=""
-    PID=`cat ${DPR_DIR}${SYM}.pid | sed -e "s/[\r\n]\+//g"`
-
+    if [ -r ${DPR_DIR}${SYM}.pid ] ; then
+	PID=`cat ${DPR_DIR}${SYM}.pid | sed -e "s/[\r\n]\+//g"`
+    fi
     case ${SYM} in
 	"dpride")
 	    PGM="dpride"
@@ -158,8 +159,8 @@ for file in ${CHECK_PGM} ; do
 	    echo DBG: "DPRIDE"
 
 	    if [ -x /usr/local/bin/dpride ] ; then
-		echo DEBUG: /usr/local/bin/dpride -L -l -o -e /var/tmp/dpride/eep.xml
-		#/usr/local/bin/dpride -L -l -o -e /var/tmp/dpride/eep.xml &
+		#echo DEBUG: /usr/local/bin/dpride -L -l -o -e /var/tmp/dpride/eep.xml
+		/usr/local/bin/dpride -L -l -o -e /var/tmp/dpride/eep.xml &
 	    else
 		LOG_LINE=`date '+%m/%d/%y %H:%M:%S'`,dpride-notfound,,
 		echo ${LOG_LINE} >> ${BTLF}
@@ -176,9 +177,7 @@ for file in ${CHECK_PGM} ; do
 	    #echo 'HOST=' ${host}
 	    #echo 'PASS=' ${pass}
 
-	    if [ -x /usr/local/bin/client ] ; then
-		;
-	    else
+	    if [ ! -x /usr/local/bin/client ] ; then
 		LOG_LINE=`date '+%m/%d/%y %H:%M:%S'`,client-notfound,,
 		echo ${LOG_LINE} >> ${BTLF}
 		echo DBG: ${LOG_LINE}  ##### DBG
@@ -187,11 +186,11 @@ for file in ${CHECK_PGM} ; do
 
 	    if [ "${host}" != "" ] ; then
 		if [ "${user}" = "" ] ; then
-		    echo DEBUG: /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 4502 -d "${domain}"
-		    #/usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 4502 -d "${domain}" &
+		    #echo DEBUG: /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 4502 -d "${domain}"
+		    /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 4502 -d "${domain}" &
 		else
-		    echo DEBUG: /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 443 -w -s -u "${user}" -P "${pass}" -d "${domain}"
-		    #/usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 443 -w -s -u "${user}" -P "${pass}" -d "${domain}" &
+		    #echo DEBUG: /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 443 -w -s -u "${user}" -P "${pass}" -d "${domain}"
+		    /usr/local/bin/client ${ETKLOGFILE} -h ${host} -p 443 -w -s -u "${user}" -P "${pass}" -d "${domain}" &
 		fi
 	    fi
 	    ;;
@@ -199,9 +198,7 @@ for file in ${CHECK_PGM} ; do
 	"opcua")
 	    echo DBG: "OPCUA"
 
-	    if [ -x /usr/local/bin/EnOceanJob ] ; then
-		;
-	    else
+	    if [ ! -x /usr/local/bin/EnOceanJob ] ; then
 		LOG_LINE=`date '+%m/%d/%y %H:%M:%S'`,EnOceanJob-notfound,,
 		echo ${LOG_LINE} >> ${BTLF}
 		echo DBG: ${LOG_LINE}  ##### DBG
@@ -209,17 +206,15 @@ for file in ${CHECK_PGM} ; do
 	    fi
 
 	    if [ "${port}" != "" ] ; then
-		echo DEBUG: /usr/local/bin/EnOceanJob ${UALOGFILE} -p "${port}" -d "${domain}"
-		#/usr/local/bin/EnOceanJob ${UALOGFILE} -p "${port}" -d "${domain}" &
+		#echo DEBUG: /usr/local/bin/EnOceanJob ${UALOGFILE} -p "${port}" -d "${domain}"
+		/usr/local/bin/EnOceanJob ${UALOGFILE} -p "${port}" -d "${domain}" &
 	    fi
 	    ;;
 	
 	"azure")
 	    echo DBG: "AZURE"
 
-	    if [ -x /usr/local/bin/iot_edge ] ; then
-		;
-	    else
+	    if [ ! -x /usr/local/bin/iot_edge ] ; then
 		LOG_LINE=`date '+%m/%d/%y %H:%M:%S'`,iot_edge-notfound,,
 		echo ${LOG_LINE} >> ${BTLF}
 		echo DBG: ${LOG_LINE}  ##### DBG
@@ -228,8 +223,8 @@ for file in ${CHECK_PGM} ; do
 
 	    IOTXCS=`cat /var/tmp/dpride/.iotx/cs`
 	    if [ X"${IOTXCS}" != X"" ] ; then
-		echo DEBUG: /usr/local/bin/iot_edge ${AZLOGFILE}
-		#/usr/local/bin/iot_edge ${AZLOGFILE} &
+		#echo DEBUG: /usr/local/bin/iot_edge ${AZLOGFILE}
+		/usr/local/bin/iot_edge ${AZLOGFILE} &
 	    fi
 	    ;;
 	
@@ -239,3 +234,7 @@ for file in ${CHECK_PGM} ; do
     esac
 
 done
+
+if [ "$1" != "nightcat" ] ; then  
+    /etc/rc.d/nightcat.sh &
+fi

@@ -6,7 +6,7 @@
 
 MYPID=$$
 ALREADY_RUNNING=""
-EGW="/etc/rc.d/egw-back.sh"
+EGW="/etc/rc.d/egw.sh"
 
 logger -i "nightcat checking"
 
@@ -34,7 +34,7 @@ while [ 1 ] ; do
     ##echo 'nightcat now!'
 
     if [ -x ${EGW} ] ; then
-	sh ${EGW}
+	${EGW} nightcat &
     fi
     
     #
