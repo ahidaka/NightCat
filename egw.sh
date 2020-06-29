@@ -71,14 +71,12 @@ if [ -r ${LOGF} ] ; then
 fi
 
 if [ -r ${ETKF} ] ; then
-    .  ${ETKF}
     CHECK_PGM="${CHECK_PGM} etk"
 else
     rm -rf ${DPR_DIR}etk.pid
 fi
 
 if [ -r ${OPCF} ] ; then
-    .  ${OPCF}
     CHECK_PGM="${CHECK_PGM} opcua"
 else
     rm -rf ${DPR_DIR}opcua.pid
@@ -111,7 +109,7 @@ for file in ${CHECK_PGM} ; do
 	    ;;
 	
 	"etk")
-	    PGM="Client"
+	    PGM="local/bin/client"
 	    ;;
 
 	"opcua")
@@ -171,7 +169,8 @@ for file in ${CHECK_PGM} ; do
 	
 	"etk")
 	    echo DBG: "ETK"
-
+	    . ${ETKF}
+	    
 	    #echo 'USER=' ${user}
 	    #echo 'DOMAIN=' ${domain}
 	    #echo 'HOST=' ${host}
@@ -197,6 +196,7 @@ for file in ${CHECK_PGM} ; do
 	
 	"opcua")
 	    echo DBG: "OPCUA"
+	    . ${OPCF}
 
 	    if [ ! -x /usr/local/bin/EnOceanJob ] ; then
 		LOG_LINE=`date '+%m/%d/%y %H:%M:%S'`,EnOceanJob-notfound,,
